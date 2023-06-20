@@ -9,7 +9,11 @@ def main():
 
     for url in urls:
         yt = YouTube(url)
-        yt.streams.filter(type="audio").filter(file_extension="mp4").order_by("abr").asc().first().download()
+        a1 = yt.streams
+        # a2 = a1.filter(type="audio")
+        a3 = a1.filter(file_extension="mp4")
+        a4 = a3.order_by("abr").asc().first().download()
+        # yt.streams.filter(type="audio").filter(file_extension="mp4").order_by("abr").asc().first().download()
 
 
 if __name__ == '__main__':
