@@ -2,7 +2,7 @@ from pytube import YouTube
 
 
 def download_video_for_running():
-    path = "urls.txt"
+    path = "important_files/urls.txt"
     urls = []
     with open(path) as reader:
         urls = [x.strip() for x in reader.readlines() if x.strip() != ""]
@@ -16,7 +16,7 @@ def download_video_for_running():
 
 
 def download_audio():
-    path = "urls.txt"
+    path = "important_files/urls.txt"
     urls = []
     with open(path) as reader:
         urls = [x.strip() for x in reader.readlines() if x.strip() != ""]
