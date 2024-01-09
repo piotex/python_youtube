@@ -1,5 +1,6 @@
 from youtube_transcript_api import YouTubeTranscriptApi
 
+
 def split_text(text, chunk_size):
     chunks = []
     current_chunk = ''
@@ -13,6 +14,7 @@ def split_text(text, chunk_size):
     if current_chunk:
         chunks.append(current_chunk)
     return chunks
+
 
 def download_subtitles():
     path_in = "urls.txt"
