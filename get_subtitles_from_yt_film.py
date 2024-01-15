@@ -1,7 +1,7 @@
 from youtube_transcript_api import YouTubeTranscriptApi
 
 
-def split_text(lines, chunk_size):
+def split_text_old(lines, chunk_size):
     chunks = []
     current_chunk = ''
     for line in lines:
@@ -13,6 +13,23 @@ def split_text(lines, chunk_size):
             else:
                 chunks.append(current_chunk)
                 current_chunk = word + ' '
+    if current_chunk:
+        chunks.append(current_chunk)
+    return chunks
+
+
+def split_text(lines, chunk_size):
+    chunks = []
+    current_chunk = ''
+    text = ' '.join(lines)
+    words = text.split()
+    for word in words:
+        if len(current_chunk) + len(word) <= chunk_size:
+            current_chunk += word + ' '
+        else:
+            chunks.append(current_chunk)
+            current_chunk = word + ' '
+
     if current_chunk:
         chunks.append(current_chunk)
     return chunks
@@ -44,6 +61,7 @@ def download_subtitles():
         with open(f"important_files/subtitles_for_chatgpt/subtitles_{i}.txt", 'w') as writer:
             elem_1 = elem.replace(str_in, str_ou)
             writer.writelines(elem_1)
+
 
 def main():
     download_subtitles()
