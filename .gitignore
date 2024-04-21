@@ -130,4 +130,7 @@ dmypy.json
 .idea
 download_resources/download_youtube_subtitles/input_data
 download_resources/download_youtube_subtitles/output_data
-
+download_resources/download_youtube_f_audio/input_data
+download_resources/download_youtube_f_audio/output_data
+download_resources/download_youtube_f_video/input_data
+download_resources/download_youtube_f_video/output_data
