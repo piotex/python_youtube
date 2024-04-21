@@ -1,8 +1,13 @@
+from download_resources.download_youtube_subtitles.create_init_dirs import create_directory_if_missing
 from download_resources.download_youtube_subtitles.download_func import get_subtitles, get_title
 from download_resources.download_youtube_subtitles.modify_func import split_subtitles
 
 
 def main():
+    init_paths = ["input_data", "output_data", "output_data/subtitles_for_google", "output_data/subtitles_for_chatgpt"]
+    for init_path in init_paths:
+        create_directory_if_missing(init_path)
+
     path_in = "input_data/urls.txt"
     with open(path_in) as reader:
         urls = [x.strip() for x in reader.readlines() if x.strip() != ""]

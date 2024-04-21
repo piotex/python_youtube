@@ -128,5 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .idea
+download_resources/download_youtube_subtitles/input_data
 download_resources/download_youtube_subtitles/output_data
 
