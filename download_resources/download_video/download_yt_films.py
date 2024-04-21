@@ -2,7 +2,7 @@ from pytube import YouTube
 
 
 def download_video_for_running():
-    path = "important_files/urls.txt"
+    path = "../../00_data/urls.txt"
     urls = []
     with open(path) as reader:
         urls = [x.strip() for x in reader.readlines() if x.strip() != ""]
@@ -15,8 +15,22 @@ def download_video_for_running():
         a6 = a5.first().download()
 
 
+def download_video_for_yt():
+    path = "../../00_data/urls.txt"
+    urls = []
+    with open(path) as reader:
+        urls = [x.strip() for x in reader.readlines() if x.strip() != ""]
+    for url in urls:
+        yt = YouTube(url)
+        a1 = yt.streams
+        a3 = a1.filter(file_extension="mp4")
+        a4 = a3.filter(type="video")
+        a5 = a4.order_by("abr").desc()  # lowest first
+        a6 = a5.first().download()
+
+
 def download_audio():
-    path = "important_files/urls.txt"
+    path = "../../00_data/urls.txt"
     urls = []
     with open(path) as reader:
         urls = [x.strip() for x in reader.readlines() if x.strip() != ""]
@@ -31,6 +45,7 @@ def download_audio():
 def main():
     download_video_for_running()
     # download_audio()
+    # download_video_for_yt()
 
 
 if __name__ == '__main__':

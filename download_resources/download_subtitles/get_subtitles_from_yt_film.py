@@ -36,7 +36,7 @@ def split_text(lines, chunk_size):
 
 
 def download_subtitles():
-    path_in = "important_files/urls.txt"
+    path_in = "../../00_data/urls.txt"
     urls = []
     res = []
     with open(path_in) as reader:
@@ -52,13 +52,13 @@ def download_subtitles():
     str_ou = '\n'
     chunks = split_text(res_text, 4500)
     for i, elem in enumerate(chunks):
-        with open(f"important_files/subtitles_for_google/subtitles_{i}.txt", 'w') as writer:
+        with open(f"00_data/subtitles_for_google/subtitles_{i}.txt", 'w') as writer:
             elem_1 = elem.replace(str_in, str_ou)
             writer.writelines(elem_1)
 
     chunks = split_text(res_text, 2000)
     for i, elem in enumerate(chunks):
-        with open(f"important_files/subtitles_for_chatgpt/subtitles_{i}.txt", 'w') as writer:
+        with open(f"00_data/subtitles_for_chatgpt/subtitles_{i}.txt", 'w') as writer:
             elem_1 = elem.replace(str_in, str_ou)
             writer.writelines(elem_1)
 
