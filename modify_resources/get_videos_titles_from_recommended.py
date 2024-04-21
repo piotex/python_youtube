@@ -1,6 +1,6 @@
 
 def main():
-    path_in = "../00_data/text_from_recommended.txt"
+    path_in = "../tmp/text_from_recommended.txt"
     lines = []
     with open(path_in) as reader:
         lines = [x.strip() for x in reader.readlines() if x.strip() != ""]
