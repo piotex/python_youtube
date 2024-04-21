@@ -1,4 +1,4 @@
-from download_resources.download_youtube_f_video.create_init_dirs import create_directory_if_missing
+from common_func.create_init_dirs import create_directory_if_missing
 from download_resources.download_youtube_f_video.download_func import download_video
 from datetime import datetime
 import time

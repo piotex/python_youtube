@@ -1,6 +1,6 @@
-from download_resources.download_youtube_subtitles.create_init_dirs import create_directory_if_missing
 from download_resources.download_youtube_subtitles.download_func import get_subtitles, get_title
 from download_resources.download_youtube_subtitles.modify_func import split_subtitles
+from common_func.create_init_dirs import create_directory_if_missing
 
 
 def main():
