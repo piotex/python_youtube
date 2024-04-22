@@ -1,10 +1,9 @@
-from download_resources.download_youtube_subtitles.download_func import get_subtitles, get_title
-from download_resources.download_youtube_subtitles.modify_func import split_subtitles
+from download_func import get_subtitles, get_title, get_url_from_home_page
 from common_func.create_init_dirs import create_directory_if_missing, create_file_if_missing
 
 
 def main():
-    init_paths = ["input_data", "output_data", "output_data/subtitles_for_google", "output_data/subtitles_for_chatgpt"]
+    init_paths = ["input_data", "output_data"]
     for init_path in init_paths:
         create_directory_if_missing(init_path)
 
@@ -15,17 +14,12 @@ def main():
 
     for url in urls:
         title = get_title(url)
-        subtitles = get_subtitles(url)
+        url_list = get_url_from_home_page(url)
+        url_list = [x for x in url_list if "/shorts/" in x]
+        with open(f"output_data/urls_{title}.txt", 'w') as writer:
+            for elem in url_list:
+                writer.write(f"{elem}\n")
 
-        subtitles_list = split_subtitles(subtitles, 4500)
-        for i, elem in enumerate(subtitles_list):
-            with open(f"output_data/subtitles_for_google/subtitles_{title}_{i}.txt", 'w') as writer:
-                writer.writelines(elem)
-
-        subtitles_list = split_subtitles(subtitles, 2000)
-        for i, elem in enumerate(subtitles_list):
-            with open(f"output_data/subtitles_for_chatgpt/subtitles_{title}_{i}.txt", 'w') as writer:
-                writer.writelines(elem)
 
 
 if __name__ == '__main__':
