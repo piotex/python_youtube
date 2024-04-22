@@ -1,6 +1,6 @@
 from download_resources.download_youtube_subtitles.download_func import get_subtitles, get_title
 from download_resources.download_youtube_subtitles.modify_func import split_subtitles
-from common_func.create_init_dirs import create_directory_if_missing
+from common_func.create_init_dirs import create_directory_if_missing, create_file_if_missing
 
 
 def main():
@@ -9,6 +9,7 @@ def main():
         create_directory_if_missing(init_path)
 
     path_in = "input_data/urls.txt"
+    create_file_if_missing(path_in)
     with open(path_in) as reader:
         urls = [x.strip() for x in reader.readlines() if x.strip() != ""]
 

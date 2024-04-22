@@ -1,4 +1,4 @@
-from common_func.create_init_dirs import create_directory_if_missing
+from common_func.create_init_dirs import create_directory_if_missing, create_file_if_missing
 from download_resources.download_youtube_f_video.download_func import download_video
 from datetime import datetime
 import time
@@ -16,6 +16,7 @@ def main():
 
     path_in = "input_data/urls.txt"
     path_out = "output_data"
+    create_file_if_missing(path_in)
 
     with open(path_in) as reader:
         urls = [x.strip() for x in reader.readlines() if x.strip() != ""]
