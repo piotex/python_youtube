@@ -137,3 +137,5 @@ download_resources/download_youtube_f_video/output_data
 download_resources/*/input_data
 download_resources/*/output_data
 passwords.py
+user_list.json
+
