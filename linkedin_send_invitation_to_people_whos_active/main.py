@@ -3,13 +3,18 @@ from selenium import webdriver
 import chromedriver_autoinstaller
 from selenium.webdriver.common.by import By
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
 class LPeople:
     url: str = ""
     number_of_contacts: int = 0
+    number_of_folowers: int = 0
+    last_activity: list[str] = field(default_factory=list)
+    country: str = ""
+    current_company: str = ""
+    current_position: str = ""
 
     processed_count: int = 0
 
@@ -36,10 +41,11 @@ def login_to_linkedin(driver: webdriver.Chrome):
 
 
 def get_users_that_liked_some_publications_in_last_24h(driver: webdriver.Chrome) -> list[LPeople]:
-    number_of_scrolls = 3
+    number_of_scrolls = 30
     keywords_list = [
-        # "aws",
-        "devops"
+        "aws",
+        "devops",
+        "google"
     ]
     return_list = []
     return_list_tmp_urls = []
@@ -66,7 +72,7 @@ def get_users_that_liked_some_publications_in_last_24h(driver: webdriver.Chrome)
                                         ]
                                         for x_path in x_path_list:
                                             try:
-                                                text = driver.find_element(By.XPATH, x_path+"/span").text
+                                                text = driver.find_element(By.XPATH, x_path + "/span").text
                                                 if text.isdigit():
                                                     driver.find_element(By.XPATH, x_path).click()
                                                     time.sleep(2)
@@ -75,13 +81,17 @@ def get_users_that_liked_some_publications_in_last_24h(driver: webdriver.Chrome)
                                                         for ii3 in range(1, int(text), 3):
                                                             x_path = f"/html/body/div[3]/div/div/div[2]"
                                                             pop_up_window = driver.find_element(By.XPATH, x_path)
-                                                            driver.execute_script(f"arguments[0].scrollTo(0, {ii3 * 1000})", pop_up_window)
+                                                            driver.execute_script(
+                                                                f"arguments[0].scrollTo(0, {ii3 * 1000})",
+                                                                pop_up_window)
                                                             time.sleep(0.5)
 
-                                                    for ii4 in range(1,int(text)+1):
+                                                    for ii4 in range(1, int(text) + 1):
                                                         x_path = f"/html/body/div[3]/div/div/div[2]/div/div/div[1]/ul/li[{ii4}]/div/div/a"
                                                         try:
-                                                            url_to_person_site = driver.find_element(By.XPATH, x_path).get_attribute('href')
+                                                            url_to_person_site = driver.find_element(By.XPATH,
+                                                                                                     x_path).get_attribute(
+                                                                'href')
                                                             return_list_tmp_urls.append(LPeople(url=url_to_person_site))
                                                         except:
                                                             pass
@@ -99,45 +109,85 @@ def get_users_that_liked_some_publications_in_last_24h(driver: webdriver.Chrome)
     return return_list_tmp_urls
 
 
-def send_invitation_to_linkedin_user(driver: webdriver.Chrome, url: str):
-    number_of_contacts = 0
-    last_activity = 0
+def get_information_from_linkedin_user(driver: webdriver.Chrome, person: LPeople) -> LPeople:
+    driver.get(person.url)
+    window_is_loaded = False
+    time.sleep(2)
+    for i in range(1, 60):
+        for i1 in range(4, 7):
+            try:
+                x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/ul/li[2]/span"
+                inner_text = driver.find_element(By.XPATH, x_path).text
+                window_is_loaded = True
+            except:
+                pass
+        if not window_is_loaded:
+            time.sleep(0.1)
 
-    driver.get(url)
-    time.sleep(3)
-
-    for i1 in range(4,7):
-        x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/ul/li[2]/span"
-        try:
-            inner_text = driver.find_element(By.XPATH, x_path).text
-            number_of_contacts = inner_text.split(" ")[0]                                                                                         # 499     500+
-            a = 0
-        except:
-            pass
-
-    for i1 in range(4,7):
-        x_path = f"/html/body/div[{i}]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/ul/li[1]/span"
-        try:
-            inner_text = driver.find_element(By.XPATH, x_path).text
-            number_of_folowers = inner_text.split(" ")[0]                                                                                         # 499     500+
-            a = 0
-        except:
-            pass
-
-
-    for i1 in range(4,7):
+    for i1 in range(4, 7):
         for i2 in range(1, 6):
             for i3 in range(3, 0, -1):
-                x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[4]/div/div/div[1]/ul/li[{i3}]/div/div/a/div/span/span[1]"
                 try:
-                    inner_text = driver.find_element(By.XPATH, x_path).text
-                    last_activity = driver.find_element(By.XPATH, x_path).text                  #  • 1 mies.  • 8h    11h   1d
-                    a = 0
+                    x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/ul/li[2]/span"
+                    person.number_of_contacts = driver.find_element(By.XPATH, x_path).text  # 499     500+
+                except:
+                    pass
+                try:
+                    x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/ul/li[1]/span"
+                    person.number_of_folowers = driver.find_element(By.XPATH, x_path).text.replace(" ", "")  # 499     500+
+                except:
+                    pass
+                try:
+                    x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[4]/div/div/div[1]/ul/li[{i3}]/div/div/a/div/span/span[1]"
+                    person.last_activity.append(driver.find_element(By.XPATH, x_path).text.split()[-1])  # mies.  8h  11h  1d
+                except:
+                    pass
+                try:
+                    x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[2]/div[2]/div[2]/span[1]"
+                    country_info_list = driver.find_element(By.XPATH, x_path).text.split()
+                    person.country = country_info_list[-1]
+                    if len(country_info_list) > 1:
+                        person.country = " ".join(country_info_list[-2:])
+                except:
+                    pass
+                try:
+                    x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[3]/ul/li[1]/div/div[2]/div[1]/div/span[1]/span[1]"
+                    person.current_company = driver.find_element(By.XPATH, x_path).text
+                except:
+                    pass
+                try:
+                    x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[3]/ul/li[1]/div/div[2]/div[1]/div/div/div/div/div/span[1]"
+                    person.current_position = driver.find_element(By.XPATH, x_path).text
                 except:
                     pass
 
+    return person
 
-    aa = 0
+
+def send_invitation_to_linkedin_user(driver: webdriver.Chrome, person: LPeople):
+    driver.get(person.url)
+    time.sleep(5)
+
+    for i1 in range(4, 7):
+        for i2 in range(1, 6):
+            try:
+                x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[2]/div[3]/div/button/span"
+                button_name = driver.find_element(By.XPATH, x_path).text
+                if "kontakt" in button_name:
+                    x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[2]/div[3]/div/button"
+                    driver.find_element(By.XPATH, x_path).click()
+                else:
+                    x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[2]/div[3]/div/div[2]/button"
+                    driver.find_element(By.XPATH, x_path).click()
+                    time.sleep(0.5)
+                    x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[2]/div[3]/div/div[2]/div/div/ul/li[3]/div/span"
+                    driver.find_element(By.XPATH, x_path).click()
+
+                x_path = "/html/body/div[3]/div/div/div[3]/button[2]"
+                driver.find_element(By.XPATH, x_path).click()
+                time.sleep(1)
+            except:
+                pass
 
 
 
@@ -188,12 +238,18 @@ def sort_by_count_descending(obj_list):
 
 
 def main():
+    data_file_path = r"C:\devops_sandbox\git\python_youtube\list_of_users_that_liked_some_publications_in_last_24h.json"
+
     list_of_users = []
     driver = None
+
     init_linkedin = True
-    get_users_from_linkedin = False
-    get_users_from_file = True
-    send_invitation = True
+    get_users_from_linkedin = True
+    get_users_from_file = False
+
+    get_user_information = False
+    send_invitation = False
+    max_number_of_users_to_process = 30
 
     if init_linkedin:
         chromedriver_autoinstaller.install()
@@ -204,74 +260,32 @@ def main():
 
     if get_users_from_linkedin:
         list_of_users = get_users_that_liked_some_publications_in_last_24h(driver)
-        with open("list_of_users_that_liked_some_publications_in_last_24h.json", "w") as f:
+        with open(data_file_path, "w") as f:
             json.dump([item.__dict__ for item in list_of_users], f, indent=4)
 
     if get_users_from_file:
-        with open("list_of_users_that_liked_some_publications_in_last_24h.json", "r") as f:
+        with open(data_file_path, "r") as f:
             list_of_users = json.load(f)
             list_of_users = [LPeople(**item) for item in list_of_users]
 
+    counter = 0
+    if get_user_information:
+        for user in list_of_users:
+            if user.country == "":
+                get_information_from_linkedin_user(driver, person=user)
+                if user.country == "":
+                    list_of_users.remove(user)
+                with open(data_file_path, "w") as f:
+                    json.dump([item.__dict__ for item in list_of_users], f, indent=4)
+                counter += 1
+            if counter >= max_number_of_users_to_process:
+                break
+
     if send_invitation:
         for user in list_of_users:
-            send_invitation_to_linkedin_user(driver, url=user.url)
+            send_invitation_to_linkedin_user(driver, person=user)
 
 
-
-
-
-
-
-
-
-
-    l_usr_list = get_user_list_from_linkedin(driver)
-    f_usr_list = get_user_list_from_file()
-
-    for i in range(len(l_usr_list)):
-        for j in range(len(f_usr_list)):
-            if l_usr_list[i].url == f_usr_list[j].url:
-                l_usr_list[i] = f_usr_list[j]
-
-    l_usr_list = sort_by_count_descending(l_usr_list)
-    new_people = 0
-    for i, item in enumerate(l_usr_list):
-        if new_people >= 30:
-            break
-        driver.get(item.url)
-        time.sleep(5)
-        x_path = "/html/body/div[6]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/ul/li/a"
-        driver.find_element(By.XPATH, x_path).click()
-        time.sleep(10)
-        for j in range(1, 11, 1):
-            try:
-                x_path = f"/html/body/div[6]/div[3]/div[2]/div/div[1]/main/div/div/div[1]/div/ul/li[{j}]/div/div/div/div[3]/div/button/span"
-                tmp_button = driver.find_element(By.XPATH, x_path).text
-                x_path = f"/html/body/div[6]/div[3]/div[2]/div/div[1]/main/div/div/div[1]/div/ul/li[{j}]/div/div/div/div[2]/div[1]/div[1]/div/span[1]/span/a/span/span[1]"
-                tmp_name = driver.find_element(By.XPATH, x_path).text
-                time.sleep(1)
-
-                if "kontakt" not in tmp_button:
-                    continue
-                for name in names_list:
-                    if name in tmp_name:
-                        raise Exception("polish name")
-
-                x_path = f"/html/body/div[6]/div[3]/div[2]/div/div[1]/main/div/div/div[1]/div/ul/li[{j}]/div/div/div/div[3]/div/button"
-                driver.find_element(By.XPATH, x_path).click()
-                time.sleep(1)
-                x_path = "/html/body/div[3]/div/div/div[3]/button[2]"
-                driver.find_element(By.XPATH, x_path).click()
-                time.sleep(1)
-                l_usr_list[i].count += 1
-                new_people += 1
-            except:
-                pass
-            a = 0
-
-    data = [item.__dict__ for item in l_usr_list]
-    with open("user_list.json", "w") as f:
-        json.dump(data, f, indent=4)
 
 
 if __name__ == '__main__':
