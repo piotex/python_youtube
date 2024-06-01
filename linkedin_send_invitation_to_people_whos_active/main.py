@@ -244,10 +244,10 @@ def main():
     driver = None
 
     init_linkedin = True
-    get_users_from_linkedin = True
-    get_users_from_file = False
+    get_users_from_linkedin = False
+    get_users_from_file = not get_users_from_linkedin
 
-    get_user_information = False
+    get_user_information = True
     send_invitation = False
     max_number_of_users_to_process = 30
 
