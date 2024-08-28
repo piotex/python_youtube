@@ -1,15 +1,10 @@
 import time
-
-import win32clipboard
 from selenium import webdriver
 import chromedriver_autoinstaller
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-
 from common_func.create_init_dirs import create_directory_if_missing, create_file_if_missing
-import win32com.client
-from passwords import *
 
 def main():
 

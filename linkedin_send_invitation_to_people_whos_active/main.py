@@ -1,3 +1,4 @@
+import datetime
 import time
 from selenium import webdriver
 import chromedriver_autoinstaller
@@ -41,7 +42,7 @@ def login_to_linkedin(driver: webdriver.Chrome):
 
 
 def get_users_that_liked_some_publications_in_last_24h(driver: webdriver.Chrome) -> list[LPeople]:
-    number_of_scrolls = 30
+    number_of_scrolls = 1
     keywords_list = [
         "aws",
         "devops",
@@ -134,12 +135,14 @@ def get_information_from_linkedin_user(driver: webdriver.Chrome, person: LPeople
                     pass
                 try:
                     x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/ul/li[1]/span"
-                    person.number_of_folowers = driver.find_element(By.XPATH, x_path).text.replace(" ", "")  # 499     500+
+                    person.number_of_folowers = driver.find_element(By.XPATH, x_path).text.replace(" ",
+                                                                                                   "")  # 499     500+
                 except:
                     pass
                 try:
                     x_path = f"/html/body/div[{i1}]/div[3]/div/div/div[2]/div/div/main/section[{i2}]/div[4]/div/div/div[1]/ul/li[{i3}]/div/div/a/div/span/span[1]"
-                    person.last_activity.append(driver.find_element(By.XPATH, x_path).text.split()[-1])  # mies.  8h  11h  1d
+                    person.last_activity.append(
+                        driver.find_element(By.XPATH, x_path).text.split()[-1])  # mies.  8h  11h  1d
                 except:
                     pass
                 try:
@@ -190,7 +193,6 @@ def send_invitation_to_linkedin_user(driver: webdriver.Chrome, person: LPeople):
                 pass
 
 
-
 def get_user_list_from_linkedin(driver: webdriver.Chrome) -> list[LPeople]:
     tmp_url = "https://www.linkedin.com/mynetwork/invite-connect/connections/"
     driver.get(tmp_url)
@@ -229,6 +231,51 @@ def get_user_list_from_file() -> list[LPeople]:
     return items
 
 
+def filter_users_data() -> list[LPeople]:
+    max_followers_threshold = 3001
+    data_file_path = r"C:\devops_sandbox\git\python_youtube\list_of_users_that_liked_some_publications_in_last_24h.json"
+    dict_countries = {}
+    with open(data_file_path, "r") as f:
+        list_of_users = json.load(f)
+        list_of_users = [LPeople(**item) for item in list_of_users]
+
+    with open(data_file_path + f".backup.{datetime.date.today()}.json", "w") as f:
+        json.dump([item.__dict__ for item in list_of_users], f, indent=4)
+
+    tmp = []
+    banned_last_activity = ["mies.", "mies", "t"]
+    for user in list_of_users:
+        is_active_user = True
+        for activity in banned_last_activity:
+            if activity in user.last_activity:
+                is_active_user = False
+                break
+
+        if is_active_user:
+            tmp.append(user)
+    list_of_users = tmp
+
+    tmp = []
+    banned_countries = ["Ukraina", ""]
+    for user in list_of_users:
+        if user.country != "" and user.country not in banned_countries:
+            tmp.append(user)
+    list_of_users = tmp
+
+    tmp = []
+    for user in list_of_users:
+        if int(user.number_of_folowers) < max_followers_threshold:
+            tmp.append(user)
+    list_of_users = tmp
+
+    print(len(list_of_users))
+
+    with open(data_file_path, "w") as f:
+        json.dump([item.__dict__ for item in list_of_users], f, indent=4)
+
+    return list_of_users
+
+
 def sort_by_count_descending(obj_list):
     def get_count(obj):
         return obj.count
@@ -244,11 +291,12 @@ def main():
     driver = None
 
     init_linkedin = True
-    get_users_from_linkedin = False
+    get_users_from_linkedin = True
     get_users_from_file = not get_users_from_linkedin
 
     get_user_information = True
-    send_invitation = False
+    filter_users = True
+    send_invitation = True
     max_number_of_users_to_process = 30
 
     if init_linkedin:
@@ -281,11 +329,12 @@ def main():
             if counter >= max_number_of_users_to_process:
                 break
 
+    if filter_users:
+        list_of_users = filter_users_data()
+
     if send_invitation:
         for user in list_of_users:
             send_invitation_to_linkedin_user(driver, person=user)
-
-
 
 
 if __name__ == '__main__':
