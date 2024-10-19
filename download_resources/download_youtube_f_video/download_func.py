@@ -1,4 +1,4 @@
-from pytube import YouTube
+from pytubefix import YouTube
 
 
 def download_video(url: str, path_out: str, high_quality: bool):

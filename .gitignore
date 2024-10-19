@@ -140,3 +140,7 @@ passwords.py
 user_list.json
 list_of_users_that_liked_some_publications_in_last_24h.json
 linkedin.pwd
+/python_do_wycinania_pauz/input_file/
+/python_do_wycinania_pauz/tmp_file/
+/python_do_wycinania_pauz/output_file/
+/python_do_wycinania_pauz/ffmpeg-N-117339-gf25c9cc213-win64-gpl-shared/
