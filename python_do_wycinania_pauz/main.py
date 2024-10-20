@@ -1,18 +1,22 @@
 import os
-from datetime import datetime
 from subprocess import check_output
 from moviepy.editor import VideoFileClip
 import time
 import pydub
-import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
-from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
 from moviepy.video.compositing.concatenate import concatenate_videoclips
 
-IMAGEMAGICK_BINARY = r"C:\Users\pkubo\Desktop\ImageMagick-7.1.1-34-portable-Q16-x64\magick.exe"
-# pip install ffmpeg-downloader
+# ===== IMPORTANT !!! ===============================================================
+# Download ffmpeg from https://github.com/BtbN/FFmpeg-Builds/releases
+# Unzip
+# Add bin to computer Env variables !
+# ===================================================================================
 
+# IMAGEMAGICK_BINARY = r"C:\Users\pkubo\Desktop\ImageMagick-7.1.1-34-portable-Q16-x64\magick.exe"             # Wro
+IMAGEMAGICK_BINARY = r"C:\Users\pkubo\Desktop\git_repo\ImageMagick-7.1.1-39-portable-Q16-x64\magick.exe"    # Szcz
+
+input_dir = r'input_file'
 tmp_file = "tmp_file"
 output_file = rf'output_file/result.mp4'
 
@@ -129,11 +133,10 @@ def create_sub_video(sub_path, dom, main_video, ypoints):
 
 
 def main():
-    input_dir = r'input_file'
     rm_tmp()
     for f_mp4 in os.listdir(input_dir):
-        f_mp4 = os.path.join(os.curdir, input_dir, f_mp4)
         start_time = time.time()
+        f_mp4 = os.path.join(os.curdir, input_dir, f_mp4)
         f_mp3 = convert_to_mp3(f_mp4)
         print(f"MP4 to MP3: {str(round(time.time() - start_time, 2))}s")
 
@@ -146,7 +149,7 @@ def main():
         print(f"Get extended domains: {str(round(time.time() - start_time, 2))}s")
         start_time = time.time()
         # # ========================================================
-        # print_sound_chart(ypoints, extended_domains)
+        print_sound_chart(ypoints, extended_domains)
         # # ========================================================
 
         part_video_list = []
